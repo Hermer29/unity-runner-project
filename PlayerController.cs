@@ -1,25 +1,89 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace PlayerController
 {
-    public class PlayerController : MonoBehaviour
+    class Interaction : MonoBehaviour
     {
-        private void Update()
+        private void Start()
         {
-            if(Input.GetKey(KeyCode.A))
+            
+        }
+    }
+    #region Enums Definitions
+    enum PlayerState
+    {
+        Alive, Died
+    }
+    enum MoveDirection
+    {
+        Forward, Up, Left, Right
+    }
+    enum PlayerPosition
+    {
+        Left, Middle, Right, Jumped
+    }
+    #endregion
+    #region Interfaces definitions
+    interface ICommand
+    {
+        void Execute();
+    }
+    #endregion
+
+    class Player : MonoBehaviour
+    {
+        public delegate void Action();
+        public GameObject PlayerObject 
+        { 
+            get {return GetComponent<GameObject>();} 
+        }
+        
+        ///Move player in said direction
+        public void MoveTowards(MoveDirection direction)
+        {
+            var directionCases = new Dictionary<MoveDirection,Action>()
             {
-                transform.Translate(-Vector3.right * 0.1f);
+                {MoveDirection.Forward,() => new Commands.MoveForward().Execute()},
+                {MoveDirection.Up,() => new Commands.MoveUp().Execute()},
+                {MoveDirection.Left,() => new Commands.MoveLeft().Execute()},
+                {MoveDirection.Right,() => new Commands.MoveRight().Execute()}
+            };
+            directionCases[direction].Invoke();
+        }
+        #region Command pattern definitions
+        private static class Commands
+        {
+            public class MoveUp : ICommand
+            {
+                public void Execute()
+                {
+                    PlayerObject.transform.Translate(Vector3.up);
+                }
             }
-            if(Input.GetKey(KeyCode.D))
+            public class MoveForward : ICommand
             {
-                transform.Translate(Vector3.right * 0.1f);
+                public void Execute()
+                {
+                    PlayerObject.transform.Translate(Vector3.up);
+                }
             }
-            if(Input.GetKeyDown(KeyCode.Space))
+            public class MoveRight : ICommand
             {
-                transform.Translate(Vector3.up);
+                public void Execute()
+                {
+                    PlayerObject.transform.Translate(Vector3.up);
+                }
+            }
+            public class MoveLeft : ICommand
+            {
+                public void Execute()
+                {
+                    PlayerObject.transform.Translate(Vector3.up);
+                }
             }
         }
+        #endregion
     }
 }
