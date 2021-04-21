@@ -6,28 +6,26 @@ using UnityEngine;
 namespace GameServices
 {
 
-    class InputGameService : MonoBehaviour
+    partial class InputGameService : MonoBehaviour
     {   
-
-        List<(KeyCode keyCode, Predicate<KeyCode> predicate, Action action)> keycodes;
+        public static InputGameService Instance;
+        private List<KeyContainer> keycodes;
 
         private void Start()
         {
-            keycodes = new List<(KeyCode keyCode, Predicate<KeyCode> predicate, Action action)>() 
-            {
-                (KeyCode.A, Input.GetKey, () => print("Test"))
-            };
+            Instance = this; 
+            keycodes = new List<KeyContainer>();
+        }
+
+        public InputGameService Add(Action action, Predicate<KeyCode> predicate, params KeyCode[] keys)
+        {
+            keycodes.Add(new KeyContainer(action, predicate, keys));
+            return this;
         }
 
         private void Update()
         {
-            foreach (var key in keycodes)
-            {
-                if (key.predicate.Invoke(key.keyCode))
-                {
-                    key.action.Invoke();
-                }
-            }
+            keycodes.ForEach(x => x.TryCheckKeys());
         }
     }
 }

@@ -1,7 +1,8 @@
 using System;
-using Components.Abstract;
 using Exceptions;
 using UnityEngine;
+using Components.Abstract;
+using Components.Mediators;
 
 namespace Components.Concrete
 {
@@ -9,11 +10,14 @@ namespace Components.Concrete
     class PlayerMovable : MonoBehaviour, IMovable
     {
         [SerializeField] private float movementSpeed = 1f;
+        private MovementMediator mediator;
         private int _currentPlayerPosition = 0;
         private Rigidbody movementObject; 
 
         private void Start()
         {
+            mediator = new MovementMediator(MoveLeft, MoveRight);
+            mediator.SubscribeOnInputEvents();
             movementObject = GetComponent<Rigidbody>();
         }
 
